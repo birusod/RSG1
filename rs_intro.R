@@ -10,7 +10,7 @@ colnames(d) <- c("mcv", "alkph", "alamatf", "aspatf",
 
 
 
-# vix
+# viz-1
 theme_set(theme_light())
 d %>% 
   ggplot(aes(mcv))+geom_density()
