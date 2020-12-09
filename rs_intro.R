@@ -37,17 +37,22 @@ d %>%
 lattice::bwplot(d$mcv)
 
 d %>% 
-  ggplot(aes(mcv)) + geom_boxplot()
+  ggplot(aes(mcv)) + 
+  geom_boxplot()
 d %>% 
-  ggplot(aes(alc_cat, mcv, fill = alc_cat)) + geom_boxplot(show.legend = F) +
+  ggplot(aes(alc_cat, mcv, fill = alc_cat)) + 
+  geom_boxplot(show.legend = F) +
   scale_fill_manual(values = c("firebrick", "cyan", "orange", "darkgreen"))
 
 d %>% 
-  ggplot(aes(mcv, aspatf)) + geom_point() + geom_smooth()
+  ggplot(aes(mcv, aspatf)) + 
+  geom_point() + 
+  geom_smooth()
 
 
 # regression: prediction of Mean Corpuscular Volume
-m <- d %>% lm(mcv ~ aspatf + alkph + alamatf, data =.)
+m <- d %>% 
+  lm(mcv ~ aspatf + alkph + alamatf, data =.)
 
 m %>% broom::tidy()
 
