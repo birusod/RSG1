@@ -140,4 +140,4 @@ table(d1)/1000
 d2 <- sample(2:12, 1000, replace = T)
 d2 %>% table()
 
-# to be continued tomorrow.
+# to be continued tomorrow with Stats.
