@@ -54,6 +54,7 @@ kurtosis(s)
 skewness(s)
 summary(s)
 fivenum(s)
+mean(s)
 sd(s)
 
 
@@ -138,3 +139,4 @@ table(d1)/1000
 # 2 dice
 d2 <- sample(2:12, 1000, replace = T)
 d2 %>% table()
+getwd()
