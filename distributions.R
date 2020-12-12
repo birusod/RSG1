@@ -132,12 +132,149 @@ sim_2 %>%
 
 # Probabilities --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ----
 
-# 1 die
-d1 <- sample(1:6, 1000, replace = T)
-table(d1)
-table(d1)/1000
-# 2 dice
-d2 <- sample(2:12, 1000, replace = T)
-d2 %>% table()
+## true probabilities
 
-# to be continued tomorrow with Stats.
+# 2 dice
+first <- rep(1:6, each = 6)
+second <- rep(1:6, 6)
+ 
+# pairing rolls
+roll_sum <- first + second
+table(roll_sum)
+prob_true <- table(roll_sum)/length(roll_sum)
+
+## simulation
+
+spl1 <- sample(1:6, 10000, replace = T)
+table(spl1)
+table(spl1)/10000
+
+spl2 <- sample(1:6, 10000, replace = T)
+spl2 %>% table()
+table(spl2)/10000
+combined <- spl1 + spl2
+prob_sim <-table(combined)/10000
+
+prob_true -prob_sim
+probs <- tibble(prob_true, prob_sim)
+probs
+lattice::barchart(prob_true)
+lattice::barchart(prob_sim)
+probs %>% 
+  mutate(roll = seq(1:11)) %>% 
+  ggplot()+
+  geom_col(aes(roll, prob_sim), fill = 'orange')+
+  geom_col(aes(roll, prob_true), fill = 'wheat',alpha = .5)
+
+
+## events generator: (predefined prob: A = .8  B = .2)
+let1 <- sample(c("A", "B"), 100, replace = TRUE, prob = c(.8, .2))
+table(let1)
+
+letters[1:5]
+sample(letters, 5)
+sample(LETTERS, 5)
+sample(LETTERS, 5, replace = T)
+
+# matrices to strings:
+matrix(1:9, 3, 3, byrow = T)
+let2 <- sample(letters, 50*5, replace = T)
+mat1 <- matrix(let2, ncol = 5)
+paste(mat1[1, ], collapse = "")
+
+random_strings <- c()
+for (i in 1:dim(mat1)[1]){
+  random_strings[i] <- paste(mat1[i,], collapse = "")
+}
+random_strings
+# 
+
+
+
+# Prob Experiment --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ----
+
+replicate(3, c("H", "T"))
+replicate(3, sample(c("H", "T"), 4, replace = T))
+replicate(3, 1:4) %>% colSums()
+
+
+sim3 <- replicate(10000,
+                  sample(c(1, 0), 10, replace = T))
+sim3[1:10, 1:4]
+dim(sim3)
+heads <- colSums(sim3)
+heads[1:10]
+table(heads)/10000
+lattice::barchart(table(heads))
+
+
+# 2 flips
+flips <- sample(c("H", "T"), 1000, replace = T)
+sequence <- c()
+for (i in 2:length(flips)){
+  first_element <- flips[i-1]
+  second_element <- flips[i]
+  sequence[i-1] <- paste0(first_element, second_element)
+}
+sequence[1:10]
+table(sequence)/1000
+barplot(table(sequence)/1000)
+# 3 flips
+flips <- sample(c("H", "T"), 10000000, replace = T)
+sequence <- c()
+for (i in 3:length(flips)){
+  first_element <- flips[i-2]
+  second_element <- flips[i-1]
+  third_element <- flips[i]
+  sequence[i-2] <- paste0(first_element, second_element, third_element)
+}
+sequence[1:10]
+table(sequence)/10000000
+barplot(table(sequence)/10000000)
+
+
+# Subjective Prob: (Bayesian concept) --- --- --- --- --- --- --- --- --- --- --- --- ----
+
+rbinom(10, 1, .5)
+
+subp1 <- c(rbinom(100, 1, .5),
+           rbinom(100, 1, .6))
+table(subp1[1:100])
+table(subp1[101:200])
+
+# with all sequence
+knowledge <- c()
+belief <- c()
+for (i in 1:length(subp1)){
+  knowledge[i] <- subp1[i]
+  belief[i] <- sum(knowledge) / length(knowledge)
+}
+plot(belief)
+
+# with just last 20
+knowledge <- c()
+belief <- c()
+for (i in 1:length(subp1)){
+  knowledge[i] <- subp1[i]
+  if (i <= 20){
+    belief[i] <- sum(knowledge) / length(knowledge)
+  } else {
+    belief[i] <- sum(knowledge[i:(i-20)]) / length(knowledge[i:(i-20)])
+  }
+}
+
+plot(belief)
+
+# with just last 5
+knowledge <- c()
+belief <- c()
+for (i in 1:length(subp1)){
+  knowledge[i] <- subp1[i]
+  if (i <= 5){
+    belief[i] <- sum(knowledge) / length(knowledge)
+  } else {
+    belief[i] <- sum(knowledge[i:(i-5)]) / length(knowledge[i:(i-5)])
+  }
+}
+
+plot(belief)
