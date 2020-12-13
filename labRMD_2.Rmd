@@ -1,0 +1,177 @@
+---
+title: "Sampling Distributions"
+author: "od"
+date: "12/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+theme_set(theme_light())
+```
+
+## 1. Probability Dist
+
+```{r}
+dist1 <- rnorm(1000)
+hist(dist1)
+lattice::histogram(dist1)
+ggplot(aes(dist1),data = as_tibble(dist1))+
+  geom_histogram(color = 'white', bins = 100)
+
+dist2 <- as_tibble(rnorm(10000, mean = 0, sd = 1))
+dist2 %>% 
+  ggplot(aes(value))+
+  geom_histogram(color = 'white', bins = 100)
+```
+
+
+#### How often did we sample a value larger than 2.5? 
+```{r}
+sum(dist1>2.5)
+```
+
+#### What is the probability that chance would produce a value larger than 2.5? 
+```{r}
+sum(dist1 > 2.5)/length(dist1)
+```
+
+#### What about any other value for this distribution?
+```{r}
+sum(dist1> 1.5)/length(dist1)
+```
+
+### Prob density function: plotting a normal curve
+
+```{r}
+sum(dist1 < 2.5)/length(dist1)
+dnorm(2.5)
+```
+
+```{r}
+dnorm(-4:4, mean = 0, sd = 1)
+pdf <- dnorm(-4:4, mean = 0, sd = 1)
+plot(pdf)
+data_points <-  tibble(values =  dnorm(-4:4, mean = 0, sd = 1), x = -4:4)
+data_points %>%
+  ggplot(aes(x, values)) +
+  geom_point()
+```
+
+```{r}
+data_line <-  tibble(values =  dnorm(seq(-4, 4, .001), mean = 0, sd = 1), 
+                     x = seq(-4, 4, .001))
+data_color1 <- data_line %>% filter(x > 2.5)
+data_line %>%
+  ggplot(aes(x, values)) +
+  geom_line()+
+  geom_ribbon(data = data_color1,
+              fill = 'red',
+              aes(ymin = 0, ymax = values))
+```
+
+### Prob density function: getting p-value
+
+```{r}
+pnorm(2.5, 0, 1) 
+pnorm(2.5, 0, 1, lower.tail = FALSE)
+```
+
+```{r}
+data_color2 <- data_line %>% filter(x < 2.5)
+data_line %>%
+  ggplot(aes(x, values)) +
+  geom_line()+
+  geom_ribbon(data = data_color2,
+              fill = 'wheat',
+              aes(ymin = 0, ymax = values))
+```
+
+### Prob density function: getting z-value
+```{r}
+qnorm(0.006209665)
+qnorm(.05) 
+qnorm(.05, lower.tail = FALSE)
+```
+
+
+## 2. Sampling Distribution
+
+```{r}
+sample_mean <- mean(rnorm(10, 0, 1))
+sample_mean
+```
+
+
+#### Plotting sample means distribution
+```{r}
+sm1 <- replicate(1000, mean(rnorm(10, 0, 1)))
+sm1 %>% lattice::histogram()
+sm1 %>% lattice::densityplot()
+```
+
+#### Standard Error of means: $\text{SEM} = \frac{\sigma}{\sqrt{N}}$
+```{r}
+sd = 1
+n = 10
+sd / sqrt(n)
+sem1 <- sd(sm1)
+sem1
+```
+
+
+## 3. Assignment
+
+#### Verification
+```{r}
+pnorm(2.5, 0, 1, lower.tail = F)
+```
+
+```{r}
+m <- rnorm(1000000, 0, 1)
+slt <- sum(m > 2.5)
+slt / 1000000
+```
+
+#### m_score = 100 sd_score = 10  N=10000  Prob score  >3 sd
+```{r}
+m_score <- 100
+sd_score <- 10
+q_3sd <- 130
+N_score <- 10000
+
+p_score <- pnorm(q = q_3sd, mean = m_score, sd = sd_score, lower.tail = F)
+
+round(p_score * N_score)
+```
+
+```{r}
+obs <- rnorm(10000, 100, 10)
+sum(obs > 130)/10000 
+```
+
+#### m_score = 10 sd_score = 20  N=25  Prob mean >= 12
+```{r}
+samp_dist <- replicate(10000, mean(rnorm(25, 10, 20)))
+hist(samp_dist)
+sum(samp_dist>= 12) / 10000
+```
+
+#### m_score = 10 sd_score = 20  N= 100  Prob mean >= 12
+```{r}
+samp_dist <- replicate(10000, mean(rnorm(100, 10, 20)))
+hist(samp_dist)
+sum(samp_dist>= 12) / 10000
+```
+
+#### m_score = 10 sd_score = 20  N= 25  Prob sd <= 15
+```{r}
+samp_dist <- replicate(10000, sd(rnorm(25, 10, 20)))
+hist(samp_dist)
+sum(samp_dist <= 15) / 10000
+```
+
